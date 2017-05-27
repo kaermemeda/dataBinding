@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        div {
+            height: 50px;
+            margin: 10px;
+        }
+
+        p {
+            height: 35px;
+            line-height: 35px;
+            text-indent: 10px;
+            border: 1px solid #ccc;
+        }
+
+        input {
+            height: 30px;
+            line-height: 30px;
+            text-indent: 5px;
+            outline: none;
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function () {
+            var info = {
+                name: 'fanzk',
+                age: 27,
+                gender: 0
+            };
+
+            var tag = document.getElementById('data').childNodes;
+            for (var i = 0; i < tag.length; i++) {
+                var html = tag[i].innerHTML;
+                if (html && /\{.*\}/.test(html)) {
+                    var defaultText = parseTagText(html)[0];
+                    var bindingText = parseTagText(html)[1];
+                    var content = bindingText.split('.').splice(1);
+                    var result = info;
+                    for (var j = 0; j < content.length; j++) {
+                        result = result[content[j]];
+                    }
+                    tag[i].innerHTML = defaultText + result;
+                    dataBinding(info, content[0], tag[i], defaultText, result);
+                }
+            }
+            //处理标签内的文本信息， return: [需要原样输出的信息, 双向绑定的信息]
+            function parseTagText(text) {
+                return /^(.*)\{(.*)\}$/.exec(text).splice(1);
+            }
+            function dataBinding(data, key, tag, defaultText, bindingText) {
+                Object.defineProperty(data, key, {
+                    get: function() {
+                        return bindingText;
+                    },
+                    set: function (value) {
+                        return tag.innerText = defaultText + value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+            }
+            document.getElementById('name').onkeyup = function (e) {
+                info.name = e.key;
+            }
+            document.getElementById('age').onclick = function () {
+                console.log(info.age)
+                info.age = info.age * 1 + 1;
+            }
+            document.getElementById('gender').onclick = function () {
+                console.log(info.gender)
+                info.gender = 1;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div>
+        <input type="text" value="改变姓名" id="name">
+        <input type="button" value="改变年龄" id="age">
+        <input type="button" value="改变性别" id="gender">
+    </div>
+    <div id="data">
+        <p>name: {info.name}</p>
+        <p>age: {info.age}</p>
+        <p>gender: {info.gender}</p>
+    </div>
+</body>
+
+</html>
