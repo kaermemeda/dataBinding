@@ -29,52 +29,27 @@
     <script type="text/javascript">
         window.onload = function () {
             var info = {
-                name: 'fanzk',
-                age: 27,
-                gender: 0
+                name: 'fanzk'
             };
 
-            var tag = document.getElementById('data').childNodes;
-            for (var i = 0; i < tag.length; i++) {
-                var html = tag[i].innerHTML;
-                if (html && /\{.*\}/.test(html)) {
-                    var defaultText = parseTagText(html)[0];
-                    var bindingText = parseTagText(html)[1];
-                    var content = bindingText.split('.').splice(1);
-                    var result = info;
-                    for (var j = 0; j < content.length; j++) {
-                        result = result[content[j]];
-                    }
-                    tag[i].innerHTML = defaultText + result;
-                    dataBinding(info, content[0], tag[i], defaultText, result);
-                }
-            }
-            //处理标签内的文本信息， return: [需要原样输出的信息, 双向绑定的信息]
-            function parseTagText(text) {
-                return /^(.*)\{(.*)\}$/.exec(text).splice(1);
-            }
-            function dataBinding(data, key, tag, defaultText, bindingText) {
-                Object.defineProperty(data, key, {
-                    get: function() {
-                        return bindingText;
-                    },
-                    set: function (value) {
-                        return tag.innerText = defaultText + value;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-            }
-            document.getElementById('name').onkeyup = function (e) {
-                info.name = e.key;
-            }
-            document.getElementById('age').onclick = function () {
-                console.log(info.age)
-                info.age = info.age * 1 + 1;
-            }
-            document.getElementById('gender').onclick = function () {
-                console.log(info.gender)
-                info.gender = 1;
+            var tag = document.getElementById('data').getElementsByTagName('p')[0];
+
+            var content = tag.innerHTML.slice(1, -1).split('.').splice(1);
+            tag.innerHTML = info[content[0]];
+
+            Object.defineProperty(info, 'name', {
+                get: function () {
+                    return tag.innerHTML;
+                },
+                set: function (value) {
+                    tag.innerHTML = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            document.getElementById('name').onkeyup = function () {
+                info.name = this.value;
             }
         }
     </script>
@@ -82,14 +57,10 @@
 
 <body>
     <div>
-        <input type="text" value="改变姓名" id="name">
-        <input type="button" value="改变年龄" id="age">
-        <input type="button" value="改变性别" id="gender">
+        <input type="text" placeholder="改变姓名" id="name">
     </div>
     <div id="data">
-        <p>name: {info.name}</p>
-        <p>age: {info.age}</p>
-        <p>gender: {info.gender}</p>
+        <p>{info.name}</p>
     </div>
 </body>
 
